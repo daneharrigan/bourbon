@@ -20,7 +20,7 @@ func (rt *router) Find(method, uri string) Action {
 	if method == "OPTIONS" {
 		var methods []string
 		var parent Bourbon
-		for k, _ := range rt.routes {
+		for k := range rt.routes {
 			for _, r := range rt.routes[k] {
 				if r.MatchString(uri) {
 					methods = append(methods, k)
