@@ -73,7 +73,7 @@ func TestMiddlewareDecodeHandlerWithJSON(t *testing.T) {
 	fn := func(e example) {}
 
 	r, _ := http.NewRequest("GET", "http://example.com", reader)
-	c := context{inject.New(), fn, nil, nil, r}
+	c := createTestContext(fn, r)
 
 	code, encodeable := DecodeHandler(c, r)
 
@@ -89,7 +89,7 @@ func TestMiddlewareDecodeHandlerWithMalformedJSON(t *testing.T) {
 	fn := func(e example) {}
 
 	r, _ := http.NewRequest("GET", "http://example.com", reader)
-	c := context{inject.New(), fn, nil, nil, r}
+	c := createTestContext(fn, r)
 
 	message := Message{
 		Code:    400,
@@ -111,7 +111,7 @@ func TestMiddlewareDecodeHandlerWithBlankBody(t *testing.T) {
 	fn := func(e example) {}
 
 	r, _ := http.NewRequest("GET", "http://example.com", reader)
-	c := context{inject.New(), fn, nil, nil, r}
+	c := createTestContext(fn, r)
 
 	code, encodeable := DecodeHandler(c, r)
 
@@ -123,10 +123,15 @@ func TestMiddlewareDecodeHandlerWithContentLengthZero(t *testing.T) {
 	fn := func() {}
 	r, _ := http.NewRequest("GET", "http://example.com", nil)
 	r.Header.Add("Content-Length", "0")
-	c := context{inject.New(), fn, nil, nil, r}
+	c := createTestContext(fn, r)
 
 	code, encodeable := DecodeHandler(c, r)
 
 	assert.Equal(t, 0, code)
 	assert.Equal(t, nil, encodeable)
+}
+
+func createTestContext(fn Handler, r *http.Request) context {
+	rt := &route{new(bourbon), "GET", "/", fn, nil}
+	return context{inject.New(), fn, nil, rt, nil, r}
 }

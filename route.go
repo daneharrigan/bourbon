@@ -9,8 +9,7 @@ type route struct {
 	method  string
 	pattern string
 	handler Handler
-	params  []string
-	matcher *regexp.Regexp
+	regexp  *regexp.Regexp
 }
 
 func (r *route) SetParent(parent Bourbon) {
@@ -33,26 +32,18 @@ func (r *route) Handler() Handler {
 	return r.handler
 }
 
-func (r *route) Params() []string {
-	return r.params
-}
-
-func (r *route) MatchString(uri string) bool {
-	if r.matcher == nil {
-		r.createMatcher()
+func (r *route) Regexp() *regexp.Regexp {
+	if r.regexp == nil {
+		r.createRegexp()
 	}
-
-	return r.matcher.MatchString(uri)
+	return r.regexp
 }
 
-func (r *route) createMatcher() {
-	uri := r.parent.Prefix() + r.pattern
+func (r *route) createRegexp() {
+	uri := r.pattern
+	if r.parent != nil {
+		uri = r.parent.Prefix() + uri
+	}
 	matchStr := variable.ReplaceAllString(uri, "([^(/|$)]+)")
-	params := variable.FindAllString(uri, -1)
-	for i := 0; i < len(params); i++ {
-		params[i] = params[i][1 : len(params[i])-1]
-	}
-
-	r.matcher = regexp.MustCompile("^" + matchStr + "$")
-	r.params = params
+	r.regexp = regexp.MustCompile("^" + matchStr + "$")
 }

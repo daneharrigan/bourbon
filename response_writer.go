@@ -1,15 +1,15 @@
 package bourbon
 
 import (
-	"net/http"
 	"encoding/json"
+	"net/http"
 )
 
 type responseWriter struct {
 	rw      http.ResponseWriter
 	written bool
-	encoder    *json.Encoder
-	flusher    http.Flusher
+	encoder *json.Encoder
+	flusher http.Flusher
 }
 
 func (w *responseWriter) Write(b []byte) (int, error) {
