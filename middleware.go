@@ -23,8 +23,7 @@ func ContentTypeHandler(rw http.ResponseWriter, r *http.Request) (int, Encodeabl
 	}
 
 	err := fmt.Sprintf("%q is not a supported Content-Type", contentType)
-	message := createMessage(415)
-	message.Errors = append(message.Errors, err)
+	message := CreateMessage(415, err)
 	return 415, message
 }
 
@@ -49,8 +48,7 @@ func DecodeHandler(c context, r *http.Request) (int, Encodeable) {
 		value := reflect.New(argument)
 		err := json.NewDecoder(r.Body).Decode(value.Interface())
 		if err != nil {
-			message := createMessage(400)
-			message.Errors = append(message.Errors, err.Error())
+			message := CreateMessage(400, err.Error())
 			return 400, message
 		}
 

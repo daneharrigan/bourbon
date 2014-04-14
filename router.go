@@ -76,7 +76,7 @@ func createOptions(methods []string) Route {
 func createMethodNotAllowed() Route {
 	return &route{
 		handler: func() (int, Encodeable) {
-			return 405, createMessage(405)
+			return 405, CreateMessage(405)
 		},
 	}
 }
@@ -84,7 +84,7 @@ func createMethodNotAllowed() Route {
 func createNotFound() Route {
 	return &route{
 		handler: func() (int, Encodeable) {
-			return 404, createMessage(404)
+			return 404, CreateMessage(404)
 		},
 	}
 }
