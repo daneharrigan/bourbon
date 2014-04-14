@@ -73,7 +73,7 @@ func TestMiddlewareDecodeHandlerWithJSON(t *testing.T) {
 	fn := func(e example) {}
 
 	r, _ := http.NewRequest("GET", "http://example.com", reader)
-	c := context{inject.New(), fn, nil, nil, r, nil}
+	c := context{inject.New(), fn, nil, nil, r}
 
 	code, encodeable := DecodeHandler(c, r)
 
@@ -89,7 +89,7 @@ func TestMiddlewareDecodeHandlerWithMalformedJSON(t *testing.T) {
 	fn := func(e example) {}
 
 	r, _ := http.NewRequest("GET", "http://example.com", reader)
-	c := context{inject.New(), fn, nil, nil, r, nil}
+	c := context{inject.New(), fn, nil, nil, r}
 
 	message := Message{
 		Code:    400,
@@ -111,7 +111,7 @@ func TestMiddlewareDecodeHandlerWithBlankBody(t *testing.T) {
 	fn := func(e example) {}
 
 	r, _ := http.NewRequest("GET", "http://example.com", reader)
-	c := context{inject.New(), fn, nil, nil, r, nil}
+	c := context{inject.New(), fn, nil, nil, r}
 
 	code, encodeable := DecodeHandler(c, r)
 
@@ -123,7 +123,7 @@ func TestMiddlewareDecodeHandlerWithContentLengthZero(t *testing.T) {
 	fn := func() {}
 	r, _ := http.NewRequest("GET", "http://example.com", nil)
 	r.Header.Add("Content-Length", "0")
-	c := context{inject.New(), fn, nil, nil, r, nil}
+	c := context{inject.New(), fn, nil, nil, r}
 
 	code, encodeable := DecodeHandler(c, r)
 

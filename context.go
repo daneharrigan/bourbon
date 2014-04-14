@@ -1,7 +1,6 @@
 package bourbon
 
 import (
-	"encoding/json"
 	"github.com/codegangsta/inject"
 	"net/http"
 	"reflect"
@@ -11,9 +10,8 @@ type context struct {
 	inject.Injector
 	handler    Handler
 	middleware []Handler
-	rw         *responseWriter
+	rw         ResponseWriter
 	r          *http.Request
-	encoder    *json.Encoder
 }
 
 func (c *context) handleReturns(values []reflect.Value, err error) {
@@ -26,7 +24,7 @@ func (c *context) handleReturns(values []reflect.Value, err error) {
 		case v.IsNil():
 			continue
 		case v.Kind() == reflect.Interface:
-			c.encoder.Encode(v.Interface())
+			c.rw.Stream(v.Interface())
 		default:
 			panic("Unexpected return type")
 		}
@@ -34,11 +32,10 @@ func (c *context) handleReturns(values []reflect.Value, err error) {
 }
 
 func (c *context) Run(rw http.ResponseWriter, r *http.Request) {
-	res := &responseWriter{rw, false}
-	c.encoder = json.NewEncoder(res)
-	c.rw = res
+	c.rw = createResponseWriter(rw)
 	c.r = r
-	c.MapTo(res, (*http.ResponseWriter)(nil))
+	c.MapTo(c.rw, (*ResponseWriter)(nil))
+	c.MapTo(c.rw, (*http.ResponseWriter)(nil))
 	c.Map(r)
 	c.Map(c)
 
@@ -54,7 +51,7 @@ func (c *context) Run(rw http.ResponseWriter, r *http.Request) {
 }
 
 func createContext(r Route) *context {
-	c := &context{inject.New(), r.Handler(), nil, nil, nil, nil}
+	c := &context{inject.New(), r.Handler(), nil, nil, nil}
 	if r.Parent() != nil {
 		c.middleware = r.Parent().Middleware()
 	}

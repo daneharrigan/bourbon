@@ -179,3 +179,24 @@ type Bourbon interface {
 	// Routes returns a slice of routes defined on the Bourbon
 	Routes() []Route
 }
+
+// ResponseWriter is Bourbon's interface for responding to HTTP requests.
+type ResponseWriter interface {
+	// Write writes a slice of bytes to the HTTP response.
+	Write([]byte) (int, error)
+
+	// WriteHeader sets the status code of the HTTP response.
+	WriteHeader(int)
+
+	// Header returns http.Header.
+	Header() http.Header
+
+	// Stream accepts encodeable data types and writes them to the response.
+	// This function can be called multiple times to stream JSON  chunks to
+	// the response.
+	Stream(Encodeable)
+
+	// Written returns a boolean indicating whether or not data has been
+	// written to the response.
+	Written() bool
+}
