@@ -22,7 +22,7 @@ func (rt *router) Find(method, uri string) Action {
 		var parent Bourbon
 		for k := range rt.routes {
 			for _, r := range rt.routes[k] {
-				if r.MatchString(uri) {
+				if r.Regexp().MatchString(uri) {
 					methods = append(methods, k)
 					parent = r.Parent()
 				}
@@ -40,7 +40,7 @@ func (rt *router) Find(method, uri string) Action {
 
 	// serve route
 	for _, r := range rt.routes[method] {
-		if r.MatchString(uri) {
+		if r.Regexp().MatchString(uri) {
 			return createContext(r)
 		}
 	}
@@ -52,7 +52,7 @@ func (rt *router) Find(method, uri string) Action {
 		}
 
 		for _, r := range routes {
-			if r.MatchString(uri) {
+			if r.Regexp().MatchString(uri) {
 				methodNotAllowed := createMethodNotAllowed()
 				methodNotAllowed.SetParent(r.Parent())
 				return createContext(methodNotAllowed)

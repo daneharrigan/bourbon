@@ -1,6 +1,9 @@
 package bourbon
 
-import "net/http"
+import (
+	"net/http"
+	"regexp"
+)
 
 // Encodeable is any data structure that encodes to JSON.
 type Encodeable interface{}
@@ -92,16 +95,10 @@ type Route interface {
 	// request.
 	Handler() Handler
 
-	// Params returns a slice of parameters declared in the URL pattern.
-	//
-	//   r.Pattern() // => /resources/{resource_id}/example/{id}
-	//   r.Params()  // => [resource_id, id]
-	Params() []string
-
-	// MatchString accepts the request URL and returns true if the route's
-	// pattern matches the URL. It will return false if the URL does not
-	// match the pattern.
-	MatchString(string) bool
+	// Regexp returns the regular expression used for matching the route
+	// against the request URL. It is also used to read parameters from the
+	// URL.
+	Regexp() *regexp.Regexp
 }
 
 // Action is Bourbon's interface for responding to a request.
