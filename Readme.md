@@ -49,6 +49,14 @@ $ curl http://localhost:5000
 {"Message":"Hello World!"}
 ```
 
+Bourbon defaults to port 5000. This can be overwritten by setting the
+environment variable `PORT` to the desired value or specifying the value in
+`Config`.
+
+```go
+bourbon.SetConfig(Config{Port: "3000"})
+```
+
 ### Features
 
 Bourbon's feature set targets JSON web services and aims to make them as easy to
