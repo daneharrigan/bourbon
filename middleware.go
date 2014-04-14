@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+// ContentTypeHandler is a middleware for handling incoming and outgoing
+// Content-Types. Incoming Content-Types that are not JSON are rejected.
+// Outgoing resposnes are given an application/json Content-Type. This
+// middleware automatically prepends routes added to Bourbon.
 func ContentTypeHandler(rw http.ResponseWriter, r *http.Request) (int, Encodeable) {
 	rw.Header().Set("Content-Type", "application/json; charset=utf-8")
 
@@ -24,6 +28,12 @@ func ContentTypeHandler(rw http.ResponseWriter, r *http.Request) (int, Encodeabl
 	return 415, message
 }
 
+// DecodeHandler is a middleware for decoding JSON request bodies into structs.
+// The middleware will analyze the argument list of the route's Handler to
+// determine if the request body should be decoded. If the argument list
+// contains a struct type that does not belong to the net/http or bourbon
+// package, DecodeHandler assumes the request body should be decoded into a
+// value of that type and passed into the route's Handler.
 func DecodeHandler(c context, r *http.Request) (int, Encodeable) {
 	if r.ContentLength == 0 {
 		return 0, nil
