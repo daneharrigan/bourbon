@@ -29,9 +29,6 @@ func New() Bourbon {
 
 // Run combines all Bourbons into a Server and runs the server. Use Run with one
 // or more Bourbons to keep the API modular and composable.
-//
-//   // running mulitple Bourbons as one server
-//   bourbon.Run(v1, v2, v3, oauth2)
 func Run(bourbons ...Bourbon) {
 	config = createConfig()
 	s := config.Server
