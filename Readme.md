@@ -51,10 +51,10 @@ $ curl http://localhost:5000
 
 Bourbon defaults to port 5000. This can be overwritten by setting the
 environment variable `PORT` to the desired value or specifying the value in
-`Config`.
+`SetPort`.
 
 ```go
-bourbon.SetConfig(Config{Port: "3000"})
+bourbon.SetPort("3000")
 ```
 
 ### Features
