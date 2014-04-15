@@ -38,7 +38,7 @@ func main() {
 Lets run the web service locally:
 
 ```console
-go run web.go
+$ go run web.go
 ```
 
 Lastly, lets make a request to the web service:
