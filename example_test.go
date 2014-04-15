@@ -1,6 +1,9 @@
 package bourbon_test
 
-import "github.com/daneharrigan/bourbon"
+import (
+	"github.com/daneharrigan/bourbon"
+	"net/http"
+)
 
 func ExampleRun() {
 	b1 := bourbon.New()
@@ -42,5 +45,43 @@ func ExampleDecodeHandler() {
 	b := bourbon.New()
 	b.Post("/messages", func(m Message) {
 		println(m.Value)
+	})
+}
+
+func ExampleHandler() {
+	b := bourbon.New()
+	// use existing net/http handlers
+	b.Get("/legacy", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Write([]byte(`{"message": "hello world"}`))
+	})
+
+	// return an int as the status code
+	b.Get("/example/1", func(rw http.ResponseWriter) int {
+		rw.Write([]byte(`{"message": "hello world"}`))
+		return 200
+	})
+
+	// return an int as the status code and an encodeable data structure
+	b.Get("/example/2", func() (int, bourbon.Encodeable) {
+		var item struct {
+			Value int
+		}
+
+		return 200, item
+	})
+
+	// decode request body
+	// POST /example
+	// { "Name": "Test" }
+
+	type Example struct {
+		Name string
+	}
+
+	// return an int as the status code and an encodeable data structure
+	// accept a custom data structure, Example in this case, and Bourbon
+	// will decode the request body into it.
+	b.Post("/example", func(e Example) (int, bourbon.Encodeable) {
+		return 201, e
 	})
 }
