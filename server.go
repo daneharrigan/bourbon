@@ -6,11 +6,14 @@ type server struct {
 }
 
 func (s *server) Run() {
-	http.ListenAndServe(":"+config.Port, s)
+	if defaultPort == "" {
+		defaultPort = "5000"
+	}
+	http.ListenAndServe(":"+defaultPort, s)
 }
 
 func (s *server) Router() Router {
-	return config.Router
+	return defaultRouter
 }
 
 func (s *server) ServeHTTP(rw http.ResponseWriter, r *http.Request) {

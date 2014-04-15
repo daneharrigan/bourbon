@@ -4,17 +4,17 @@ import "github.com/daneharrigan/bourbon"
 
 func ExampleRun() {
 	b1 := bourbon.New()
-	b1.Get("/b1", func(){})
+	b1.Get("/b1", func() {})
 
 	b2 := bourbon.New()
-	b2.Get("/b2", func(){})
+	b2.Get("/b2", func() {})
 
 	bourbon.Run(b1, b2)
 }
 
 func ExampleParams() {
 	b := bourbon.New()
-	b.Get("/resources/{id}", func(params bourbon.Params){
+	b.Get("/resources/{id}", func(params bourbon.Params) {
 		println(params["id"])
 	})
 
@@ -40,7 +40,7 @@ func ExampleDecodeHandler() {
 	}
 
 	b := bourbon.New()
-	b.Post("/messages", func(m Message){
+	b.Post("/messages", func(m Message) {
 		println(m.Value)
 	})
 }
