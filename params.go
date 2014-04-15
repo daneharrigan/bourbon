@@ -1,5 +1,11 @@
 package bourbon
 
+// Params is a map of parameter names and their values from the request URL.
+//
+//   b := bourbon.New()
+//   b.Get("/resources/{id}", func(params Params){
+//     println(params["id"])
+//   })
 type Params map[string]string
 
 func createParams(c *context) Params {
