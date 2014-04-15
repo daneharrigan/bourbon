@@ -47,3 +47,7 @@ func (r *route) createRegexp() {
 	matchStr := variable.ReplaceAllString(uri, "([^(/|$)]+)")
 	r.regexp = regexp.MustCompile("^" + matchStr + "$")
 }
+
+func createRoute(method, pattern string, fn Handler) Route {
+	return &route{method: method, pattern: pattern, handler: fn}
+}

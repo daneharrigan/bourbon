@@ -18,32 +18,6 @@ type Encodeable interface{}
 // Handlers can return zero, one, or two values. If an integer is returned, it is
 // usd as the status code. If an Encodeable is returned, it is encoded and
 // written to the response.
-//
-//   b := bourbon.New()
-//   b.Get("/example/1", func(rw http.ResponseWriter) int {
-//     rw.Write(...)
-//     return 200
-//   })
-//
-//   b.Get("/example/2", func() (int, bourbon.Encodeable) {
-//     var item struct {
-//       Value int
-//     }
-//
-//     return 200, item
-//   })
-//
-//   // decode request body
-//   // POST /example
-//   // { "Name": "Test" }
-//
-//   type Example struct {
-//     Name string
-//   }
-//
-//   b.Post("/example", func(e Example) (int, bourbon.Encodeable) {
-//     return 201, e
-//   })
 type Handler interface{}
 
 // Server is Bourbon's Server interface. It accepts and coordinates requests

@@ -12,11 +12,20 @@
 //   bourbon.Run(b)
 package bourbon
 
+import "os"
+
 type bourbon struct {
 	prefix     string
 	routes     []Route
 	middleware []Handler
 }
+
+var (
+	defaultPort        string = os.Getenv("PORT")
+	defaultRouter      Router = &router{routes: make(map[string][]Route)}
+	defaultServer      Server = new(server)
+	defaultCreateRoute        = createRoute
+)
 
 // New allocates a new Bourbon.
 func New() Bourbon {
@@ -30,24 +39,36 @@ func New() Bourbon {
 // Run combines all Bourbons into a Server and runs the server. Use Run with one
 // or more Bourbons to keep the API modular and composable.
 func Run(bourbons ...Bourbon) {
-	config = createConfig()
-	s := config.Server
-
 	for _, b := range bourbons {
-		s.Router().Add(b.Routes()...)
+		defaultServer.Router().Add(b.Routes()...)
 	}
 
-	s.Run()
+	defaultServer.Run()
 }
 
-// SetConfig accepts a Config struct to override the default Server,
-// Router and port number.
-//
-//   bourbon.SetConfig(Config{
-//     Router: new(myCustomRouter)
-//   })
-func SetConfig(c Config) {
-	config = &c
+// SetRouter accepts a struct that implements that Router interface and replaces
+// Bourbon's default router.
+func SetRouter(rt Router) {
+	defaultRouter = rt
+}
+
+// SetServer accepts a struct that implements that Server interface and replaces
+// Bourbon's default Server.
+func SetServer(s Server) {
+	defaultServer = s
+}
+
+// SetPort accepts a port as a string and overrides the default port "5000". The
+// default port can also be overwritten by setting the environment variable PORT
+// to the desired value.
+func SetPort(p string) {
+	defaultPort = p
+}
+
+// SetCreateRoute accepts a function for creating new routes within Bourbon and
+// overrides Bourbon's default function.
+func SetCreateRoute(fn func(method, pattern string, fn Handler) Route) {
+	defaultCreateRoute = fn
 }
 
 func (b *bourbon) SetPrefix(prefix string) {
@@ -95,7 +116,7 @@ func (b *bourbon) Delete(pattern string, fn Handler) {
 }
 
 func (b *bourbon) addRoute(method, pattern string, fn Handler) {
-	r := createConfig().CreateRoute(method, pattern, fn)
+	r := defaultCreateRoute(method, pattern, fn)
 	r.SetParent(b)
 	b.routes = append(b.routes, r)
 }
