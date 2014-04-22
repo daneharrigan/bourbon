@@ -24,7 +24,6 @@ var (
 	defaultPort        string = os.Getenv("PORT")
 	defaultRouter      Router = &router{routes: make(map[string][]Route)}
 	defaultServer      Server = new(server)
-	defaultCreateRoute        = createRoute
 )
 
 // New allocates a new Bourbon.
@@ -63,12 +62,6 @@ func SetServer(s Server) {
 // to the desired value.
 func SetPort(p string) {
 	defaultPort = p
-}
-
-// SetCreateRoute accepts a function for creating new routes within Bourbon and
-// overrides Bourbon's default function.
-func SetCreateRoute(fn func(method, pattern string, fn Handler) Route) {
-	defaultCreateRoute = fn
 }
 
 func (b *bourbon) SetPrefix(prefix string) {
@@ -116,7 +109,7 @@ func (b *bourbon) Delete(pattern string, fn Handler) {
 }
 
 func (b *bourbon) addRoute(method, pattern string, fn Handler) {
-	r := defaultCreateRoute(method, pattern, fn)
+	r := createRoute(method, pattern, fn)
 	r.SetParent(b)
 	b.routes = append(b.routes, r)
 }
