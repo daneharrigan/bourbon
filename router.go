@@ -5,17 +5,17 @@ import (
 	"strings"
 )
 
-type router struct {
+type defaultRouter struct {
 	routes map[string][]Route
 }
 
-func (rt *router) Add(routes ...Route) {
+func (rt *defaultRouter) Add(routes ...Route) {
 	for _, r := range routes {
 		rt.routes[r.Method()] = append(rt.routes[r.Method()], r)
 	}
 }
 
-func (rt *router) Find(method, uri string) Action {
+func (rt *defaultRouter) Find(method, uri string) Action {
 	// serve OPTIONS
 	if method == "OPTIONS" {
 		var methods []string

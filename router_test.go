@@ -60,8 +60,8 @@ func TestRouterFindMethodNotAllowed(t *testing.T) {
 	assert.Equal(t, msg, enc[:len(enc)-1])
 }
 
-func createRouter() *router {
-	return &router{routes: make(map[string][]Route)}
+func createRouter() *defaultRouter {
+	return &defaultRouter{routes: make(map[string][]Route)}
 }
 
 func createRouterWithRoute() (Router, *http.Request, *httptest.ResponseRecorder) {

@@ -21,10 +21,16 @@ type bourbon struct {
 }
 
 var (
-	defaultPort        string = os.Getenv("PORT")
-	defaultRouter      Router = &router{routes: make(map[string][]Route)}
-	defaultServer      Server = new(server)
+	port   string
+	router Router
+	server Server
 )
+
+func init() {
+	port = os.Getenv("PORT")
+	server = new(defaultServer)
+	router = &defaultRouter{routes: make(map[string][]Route)}
+}
 
 // New allocates a new Bourbon.
 func New() Bourbon {
@@ -39,29 +45,29 @@ func New() Bourbon {
 // or more Bourbons to keep the API modular and composable.
 func Run(bourbons ...Bourbon) {
 	for _, b := range bourbons {
-		defaultServer.Router().Add(b.Routes()...)
+		server.Router().Add(b.Routes()...)
 	}
 
-	defaultServer.Run()
+	server.Run()
 }
 
 // SetRouter accepts a struct that implements that Router interface and replaces
 // Bourbon's default router.
-func SetRouter(rt Router) {
-	defaultRouter = rt
+func SetRouter(r Router) {
+	router = r
 }
 
 // SetServer accepts a struct that implements that Server interface and replaces
 // Bourbon's default Server.
 func SetServer(s Server) {
-	defaultServer = s
+	server = s
 }
 
 // SetPort accepts a port as a string and overrides the default port "5000". The
 // default port can also be overwritten by setting the environment variable PORT
 // to the desired value.
 func SetPort(p string) {
-	defaultPort = p
+	port = p
 }
 
 func (b *bourbon) SetPrefix(prefix string) {
