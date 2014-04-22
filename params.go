@@ -6,12 +6,12 @@ type Params map[string]string
 func createParams(c *context) Params {
 	params := make(Params)
 
-	keys := c.route.Regexp().FindAllStringSubmatch(c.route.Pattern(), -1)
+	keys := c.route.Regexp.FindAllStringSubmatch(c.route.Pattern, -1)
 	if len(keys) == 0 {
 		return params
 	}
 
-	vals := c.route.Regexp().FindAllStringSubmatch(c.r.URL.Path, -1)
+	vals := c.route.Regexp.FindAllStringSubmatch(c.r.URL.Path, -1)
 	for i := 1; i < len(keys[0]); i++ {
 		key := keys[0][i]
 		val := vals[0][i]

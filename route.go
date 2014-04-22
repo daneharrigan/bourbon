@@ -4,50 +4,23 @@ import "regexp"
 
 var variable = regexp.MustCompile(`{([^}]+)}`)
 
-type route struct {
-	parent  Bourbon
-	method  string
-	pattern string
-	handler Handler
-	regexp  *regexp.Regexp
+type Route struct {
+	Parent  Bourbon
+	Method  string
+	Pattern string
+	Handler Handler
+	Regexp  *regexp.Regexp
 }
 
-func (r *route) SetParent(parent Bourbon) {
-	r.parent = parent
-}
-
-func (r *route) Parent() Bourbon {
-	return r.parent
-}
-
-func (r *route) Method() string {
-	return r.method
-}
-
-func (r *route) Pattern() string {
-	return r.pattern
-}
-
-func (r *route) Handler() Handler {
-	return r.handler
-}
-
-func (r *route) Regexp() *regexp.Regexp {
-	if r.regexp == nil {
-		r.createRegexp()
+func (r *Route) Build() {
+	uri := r.Pattern
+	if r.Parent != nil {
+		uri = r.Parent.Prefix() + uri
 	}
-	return r.regexp
+	matcher := variable.ReplaceAllString(uri, "([^(/|$)]+)")
+	r.Regexp = regexp.MustCompile("^" + matcher + "$")
 }
 
-func (r *route) createRegexp() {
-	uri := r.pattern
-	if r.parent != nil {
-		uri = r.parent.Prefix() + uri
-	}
-	matchStr := variable.ReplaceAllString(uri, "([^(/|$)]+)")
-	r.regexp = regexp.MustCompile("^" + matchStr + "$")
-}
-
-func createRoute(method, pattern string, fn Handler) Route {
-	return &route{method: method, pattern: pattern, handler: fn}
+func createRoute(method, pattern string, fn Handler) *Route {
+	return &Route{Method: method, Pattern: pattern, Handler: fn}
 }

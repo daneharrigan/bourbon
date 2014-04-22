@@ -132,6 +132,6 @@ func TestMiddlewareDecodeHandlerWithContentLengthZero(t *testing.T) {
 }
 
 func createTestContext(fn Handler, r *http.Request) context {
-	rt := &route{new(bourbon), "GET", "/", fn, nil}
+	rt := &Route{new(bourbon), "GET", "/", fn, nil}
 	return context{inject.New(), fn, nil, rt, nil, r}
 }

@@ -11,25 +11,25 @@ import (
 )
 
 func TestRouterAdd(t *testing.T) {
-	rt := createRouter()
-	rt.Add(&route{parent: new(bourbon), method: "GET", pattern: "/"})
-	rt.Add(&route{parent: new(bourbon), method: "POST", pattern: "/"})
+	r := createRouter()
+	r.Add(&Route{Parent: new(bourbon), Method: "GET", Pattern: "/"})
+	r.Add(&Route{Parent: new(bourbon), Method: "POST", Pattern: "/"})
 
-	assert.Equal(t, 1, len(rt.routes["GET"]))
-	assert.Equal(t, 1, len(rt.routes["POST"]))
+	assert.Equal(t, 1, len(r.routes["GET"]))
+	assert.Equal(t, 1, len(r.routes["POST"]))
 }
 
 func TestRouterFindRoute(t *testing.T) {
-	rt, r, rw := createRouterWithRoute()
-	action := rt.Find("OPTIONS", "/")
-	action.Run(rw, r)
+	r, req, rw := createRouterWithRoute()
+	action := r.Find("OPTIONS", "/")
+	action.Run(rw, req)
 	assert.Equal(t, 200, rw.Code)
 }
 
 func TestRouterFindOptions(t *testing.T) {
-	rt, r, rw := createRouterWithRoute()
-	action := rt.Find("OPTIONS", "/")
-	action.Run(rw, r)
+	r, req, rw := createRouterWithRoute()
+	action := r.Find("OPTIONS", "/")
+	action.Run(rw, req)
 
 	assert.Equal(t, 200, rw.Code)
 	assert.Equal(t, "0", rw.HeaderMap.Get("Content-Length"))
@@ -37,9 +37,9 @@ func TestRouterFindOptions(t *testing.T) {
 }
 
 func TestRouterFindPageNotFound(t *testing.T) {
-	rt, r, rw := createRouterWithRoute()
-	action := rt.Find("GET", "/404")
-	action.Run(rw, r)
+	r, req, rw := createRouterWithRoute()
+	action := r.Find("GET", "/404")
+	action.Run(rw, req)
 
 	msg, _ := json.Marshal(Message{Code: 404, Message: http.StatusText(404)})
 	enc, _ := ioutil.ReadAll(rw.Body)
@@ -49,9 +49,9 @@ func TestRouterFindPageNotFound(t *testing.T) {
 }
 
 func TestRouterFindMethodNotAllowed(t *testing.T) {
-	rt, r, rw := createRouterWithRoute()
-	action := rt.Find("POST", "/")
-	action.Run(rw, r)
+	r, req, rw := createRouterWithRoute()
+	action := r.Find("POST", "/")
+	action.Run(rw, req)
 
 	msg, _ := json.Marshal(Message{Code: 405, Message: http.StatusText(405)})
 	enc, _ := ioutil.ReadAll(rw.Body)
@@ -61,14 +61,15 @@ func TestRouterFindMethodNotAllowed(t *testing.T) {
 }
 
 func createRouter() *defaultRouter {
-	return &defaultRouter{routes: make(map[string][]Route)}
+	return &defaultRouter{routes: make(map[string][]*Route)}
 }
 
 func createRouterWithRoute() (Router, *http.Request, *httptest.ResponseRecorder) {
 	fn := func() int { return 200 }
-	rt := createRouter()
-	rt.Add(&route{parent: new(bourbon), method: "GET", pattern: "/", handler: fn})
-	r, _ := http.NewRequest("GET", "http://example.com/", strings.NewReader(""))
+	route := &Route{Parent: new(bourbon), Method: "GET", Pattern: "/", Handler: fn}
+	r := createRouter()
+	r.Add(route)
+	req, _ := http.NewRequest("GET", "http://example.com/", strings.NewReader(""))
 	rw := httptest.NewRecorder()
-	return rt, r, rw
+	return r, req, rw
 }
