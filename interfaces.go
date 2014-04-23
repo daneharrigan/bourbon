@@ -1,6 +1,9 @@
 package bourbon
 
-import "net/http"
+import (
+	"net/http"
+	"regexp"
+)
 
 // Encodeable is any data structure that encodes to JSON.
 type Encodeable interface{}
@@ -35,13 +38,12 @@ type Server interface {
 // Bourbon.
 type Router interface {
 	// Add appends routes to the Router.
-	Add(...*Route)
+	Add(...Route)
 
 	// Find accepts the request method, URL and returns an Action.
 	Find(string, string) Action
 }
 
-/*
 // Route is Bourbon's Route interface. It stores the HTTP request method, URL
 // pattern, Handler and Bourbon parent on which it was declared. A Route is
 // appened to the Router's list of routes and queried on each HTTP request.
@@ -71,8 +73,12 @@ type Route interface {
 	// against the request URL. It is also used to read parameters from the
 	// URL.
 	Regexp() *regexp.Regexp
+
+	// Build creates and assigns the regular expression used to match the
+	// request URL and read parameters from the URL.
+	Build()
 }
-*/
+
 // Action is Bourbon's interface for responding to a request.
 type Action interface {
 	// Run invokes the middleware and Handler scoped to the request.
@@ -81,6 +87,9 @@ type Action interface {
 
 // Bourbon is the initial interface in the Bourbon package.
 type Bourbon interface {
+	// Parent returns the parent Bourbon structure
+	Parent() Bourbon
+
 	// SetPrefix accepts a string to prefix every route in the Bourbon.
 	//
 	//   v1 := bourbon.New()
@@ -146,7 +155,7 @@ type Bourbon interface {
 	Delete(string, Handler)
 
 	// Routes returns a slice of routes defined on the Bourbon
-	Routes() []*Route
+	Routes() []Route
 }
 
 // ResponseWriter is Bourbon's interface for responding to HTTP requests.

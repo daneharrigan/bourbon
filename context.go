@@ -10,7 +10,7 @@ type context struct {
 	inject.Injector
 	handler    Handler
 	middleware []Handler
-	route      *Route
+	route      Route
 	rw         ResponseWriter
 	r          *http.Request
 }
@@ -52,10 +52,10 @@ func (c *context) Run(rw http.ResponseWriter, r *http.Request) {
 	c.handleReturns(c.Invoke(c.handler))
 }
 
-func createContext(r *Route) *context {
+func createContext(r Route) *context {
 	c := &context{inject.New(), r.Handler, nil, r, nil, nil}
-	if r.Parent != nil {
-		c.middleware = r.Parent.Middleware()
+	if r.Parent() != nil {
+		c.middleware = r.Parent().Middleware()
 	}
 
 	return c

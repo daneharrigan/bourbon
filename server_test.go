@@ -7,6 +7,6 @@ import (
 
 func TestServerRouter(t *testing.T) {
 	server := new(defaultServer)
-	r := &defaultRouter{routes: make(map[string][]*Route)}
+	r := createRouter()
 	assert.Equal(t, r, server.Router())
 }

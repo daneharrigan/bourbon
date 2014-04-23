@@ -16,8 +16,9 @@ import "os"
 
 type bourbon struct {
 	prefix     string
-	routes     []*Route
+	routes     []Route
 	middleware []Handler
+	parent Bourbon
 }
 
 var (
@@ -29,7 +30,7 @@ var (
 func init() {
 	port = os.Getenv("PORT")
 	server = new(defaultServer)
-	router = &defaultRouter{routes: make(map[string][]*Route)}
+	router = &defaultRouter{routes: make(map[string][]Route)}
 }
 
 // New allocates a new Bourbon.
@@ -70,6 +71,10 @@ func SetPort(p string) {
 	port = p
 }
 
+func (b *bourbon) Parent() Bourbon {
+	return b.parent
+}
+
 func (b *bourbon) SetPrefix(prefix string) {
 	b.prefix = prefix
 }
@@ -78,7 +83,7 @@ func (b *bourbon) Prefix() string {
 	return b.prefix
 }
 
-func (b *bourbon) Routes() []*Route {
+func (b *bourbon) Routes() []Route {
 	return b.routes
 }
 
@@ -116,6 +121,6 @@ func (b *bourbon) Delete(pattern string, fn Handler) {
 
 func (b *bourbon) addRoute(method, pattern string, fn Handler) {
 	r := createRoute(method, pattern, fn)
-	r.Parent = b
+	r.SetParent(b)
 	b.routes = append(b.routes, r)
 }

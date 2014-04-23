@@ -10,7 +10,7 @@ import (
 )
 
 func TestCreateParams(t *testing.T) {
-	r := &Route{Parent: new(bourbon), Pattern: "/one/{one_id}/two/{two_id}"}
+	r := &route{parent: new(bourbon), pattern: "/one/{one_id}/two/{two_id}"}
 	r.Build()
 	req, _ := http.NewRequest("GET", "http://example.com/one/1/two/2", nil)
 	c := &context{route: r, r: req}
@@ -29,7 +29,7 @@ func TestParamsArgument(t *testing.T) {
 		strings.NewReader(""))
 	rw := httptest.NewRecorder()
 	c := createTestContext(fn, req)
-	c.route = &Route{Parent: new(bourbon), Pattern: "/one/{one_id}", Handler: fn}
+	c.route = &route{parent: new(bourbon), pattern: "/one/{one_id}", handler: fn}
 	c.route.Build()
 	c.Run(rw, req)
 
