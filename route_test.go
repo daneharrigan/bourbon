@@ -58,7 +58,7 @@ func TestRoutePatternWithParents(t *testing.T) {
 
 func TestRouteMiddlewareWithParents(t *testing.T) {
 	parent := new(bourbon)
-	parent.Get("/", func(){})
+	parent.Get("/", func() {})
 	parent.Use(func() {})
 
 	first := new(bourbon)

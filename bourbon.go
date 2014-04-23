@@ -15,7 +15,7 @@ package bourbon
 import "os"
 
 type bourbon struct {
-	parent	Bourbon
+	parent     Bourbon
 	prefix     string
 	routes     []Route
 	middleware []Handler
@@ -23,9 +23,9 @@ type bourbon struct {
 }
 
 var (
-	port        string
-	router      Router
-	server      Server
+	port       string
+	router     Router
+	server     Server
 	middleware []Handler
 )
 
