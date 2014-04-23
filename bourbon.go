@@ -27,7 +27,12 @@ var (
 	defaultRouter      Router = &router{routes: make(map[string][]Route)}
 	defaultServer      Server = new(server)
 	defaultCreateRoute        = createRoute
+	middleware []Handler
 )
+
+func init() {
+	middleware = append(middleware, ContentTypeHandler, DecodeHandler)
+}
 
 // New allocates a new Bourbon.
 func New() Bourbon {
@@ -94,8 +99,8 @@ func (b *bourbon) Middleware() []Handler {
 	return append(b.Parent().Middleware(), b.middleware)
 }
 
-func (b *bourbon) Use(middleware ...Handler) {
-	b.middleware = append(b.middleware, middleware...)
+func (b *bourbon) Use(handlers ...Handler) {
+	b.middleware = append(b.middleware, handlers...)
 }
 
 func (b *bourbon) Get(pattern string, fn Handler) {
