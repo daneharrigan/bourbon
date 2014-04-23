@@ -27,10 +27,10 @@ func TestParamsArgument(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://example.com/one/1",
 		strings.NewReader(""))
 	rw := httptest.NewRecorder()
-	c := createTestContext(fn, req)
-	c.route = &route{parent: new(bourbon), pattern: "/one/{one_id}", handler: fn}
-	c.Run(rw, req)
+	r := &route{parent: new(bourbon), pattern: "/one/{one_id}", handler: fn}
+	c := createContext(r, rw, req)
+	c.Run()
 
 	body, _ := ioutil.ReadAll(rw.Body)
-	assert.Equal(t, []byte("1"), body)
+	assert.Equal(t, "1", string(body))
 }

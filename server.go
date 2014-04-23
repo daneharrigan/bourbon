@@ -16,7 +16,8 @@ func (s *server) Router() Router {
 	return defaultRouter
 }
 
-func (s *server) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-	action := s.Router().Find(r.Method, r.URL.Path)
-	action.Run(rw, r)
+func (s *server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+	r := s.Router().Find(req.Method, req.URL.Path)
+	c := createContext(r, rw, req)
+	c.Run()
 }
