@@ -92,7 +92,11 @@ func (b *bourbon) Routes() []Route {
 }
 
 func (b *bourbon) Middleware() []Handler {
-	return b.middleware
+	if b.Parent() == nil {
+		return b.middleware
+	}
+
+	return append(b.Parent().Middleware(), b.middleware)
 }
 
 func (b *bourbon) Use(middleware ...Handler) {

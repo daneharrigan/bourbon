@@ -40,6 +40,10 @@ func (r *route) Handler() Handler {
 	return r.handler
 }
 
+func (r *route) Middleware() []Handler {
+	return r.Parent().Middleware()
+}
+
 func (r *route) Regexp() *regexp.Regexp {
 	if r.regexp == nil {
 		r.createRegexp()

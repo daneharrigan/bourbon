@@ -69,6 +69,11 @@ type Route interface {
 	// request.
 	Handler() Handler
 
+	// Middleware returns a slice of Handlers to be invoked before invoking
+	// the route Handler. The slice contains all middleware of the parent
+	// Bourbon and the Bourbon's following parents.
+	Middleware() []Handler
+
 	// Regexp returns the regular expression used for matching the route
 	// against the request URL. It is also used to read parameters from the
 	// URL.
