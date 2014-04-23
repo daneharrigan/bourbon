@@ -75,7 +75,7 @@ func (b *bourbon) Children() []Bourbon {
 }
 
 func (b *bourbon) Mount(child Bourbon) {
-	b.SetParent(b)
+	child.SetParent(b)
 	b.children = append(b.children, child)
 }
 
