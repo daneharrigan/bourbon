@@ -2,21 +2,21 @@ package bourbon
 
 import "net/http"
 
-type server struct {
+type defaultServer struct {
 }
 
-func (s *server) Run() {
-	if defaultPort == "" {
-		defaultPort = "5000"
+func (s *defaultServer) Run() {
+	if port == "" {
+		port = "5000"
 	}
-	http.ListenAndServe(":"+defaultPort, s)
+	http.ListenAndServe(":"+port, s)
 }
 
-func (s *server) Router() Router {
-	return defaultRouter
+func (s *defaultServer) Router() Router {
+	return router
 }
 
-func (s *server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
+func (s *defaultServer) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	r := s.Router().Find(req.Method, req.URL.Path)
 	c := createContext(r, rw, req)
 	c.Run()

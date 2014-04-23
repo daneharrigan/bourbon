@@ -11,7 +11,7 @@ import (
 )
 
 func TestRouterAdd(t *testing.T) {
-	rt := createRouter()
+	rt := createDefaultRouter().(*defaultRouter)
 	rt.Add(&route{parent: new(bourbon), method: "GET", pattern: "/"})
 	rt.Add(&route{parent: new(bourbon), method: "POST", pattern: "/"})
 
@@ -64,13 +64,9 @@ func TestRouterFindMethodNotAllowed(t *testing.T) {
 	assert.Equal(t, msg, enc[:len(enc)-1])
 }
 
-func createRouter() *router {
-	return &router{routes: make(map[string][]Route)}
-}
-
 func createRouterWithRoute() (Router, *http.Request, *httptest.ResponseRecorder) {
 	fn := func() int { return 200 }
-	rt := createRouter()
+	rt := createDefaultRouter()
 	rt.Add(&route{parent: new(bourbon), method: "GET", pattern: "/", handler: fn})
 	r, _ := http.NewRequest("GET", "http://example.com/", strings.NewReader(""))
 	rw := httptest.NewRecorder()

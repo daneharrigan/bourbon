@@ -23,43 +23,41 @@ type bourbon struct {
 }
 
 var (
-	defaultPort        string = os.Getenv("PORT")
-	defaultRouter      Router = &router{routes: make(map[string][]Route)}
-	defaultServer      Server = new(server)
-	defaultCreateRoute        = createRoute
+	port        string
+	router      Router
+	server      Server
 	middleware []Handler
 )
 
 func init() {
+	port = os.Getenv("PORT")
+	router = createDefaultRouter()
+	server = new(defaultServer)
 	middleware = append(middleware, ContentTypeHandler, DecodeHandler)
 }
 
 // New allocates a new Bourbon.
 func New() Bourbon {
-	b := new(bourbon)
-	b.Use(ContentTypeHandler)
-	b.Use(DecodeHandler)
-
-	return b
+	return new(bourbon)
 }
 
 // SetRouter accepts a struct that implements that Router interface and replaces
 // Bourbon's default router.
-func SetRouter(rt Router) {
-	defaultRouter = rt
+func SetRouter(r Router) {
+	router = r
 }
 
 // SetServer accepts a struct that implements that Server interface and replaces
 // Bourbon's default Server.
 func SetServer(s Server) {
-	defaultServer = s
+	server = s
 }
 
 // SetPort accepts a port as a string and overrides the default port "5000". The
 // default port can also be overwritten by setting the environment variable PORT
 // to the desired value.
 func SetPort(p string) {
-	defaultPort = p
+	port = p
 }
 
 func (b *bourbon) SetParent(parent Bourbon) {
@@ -128,12 +126,12 @@ func (b *bourbon) Delete(pattern string, fn Handler) {
 }
 
 func (b *bourbon) Run() {
-	appendRoute(defaultServer.Router(), b)
-	defaultServer.Run()
+	appendRoute(server.Router(), b)
+	server.Run()
 }
 
 func (b *bourbon) addRoute(method, pattern string, fn Handler) {
-	r := defaultCreateRoute(method, pattern, fn)
+	r := createRoute(method, pattern, fn)
 	r.SetParent(b)
 	b.routes = append(b.routes, r)
 }
