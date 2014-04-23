@@ -83,6 +83,20 @@ type Action interface {
 
 // Bourbon is the initial interface in the Bourbon package.
 type Bourbon interface {
+	// SetParent assigns a Bourbon as the parent of another Bourbon
+	// structure.
+	SetParent(Bourbon)
+
+	// Parent return the parent Bourbon structure.
+	Parent() Bourbon
+
+	// Children returns a slice of embedded Bourbon structures.
+	Children() []Bourbon
+
+	// Mount embeds a Bourbon within another Bourbon. The embedded Bourbon
+	// inherits the middleware and error handling of the parent Bourbon.
+	Mount(Bourbon)
+
 	// SetPrefix accepts a string to prefix every route in the Bourbon.
 	//
 	//   v1 := bourbon.New()
@@ -149,6 +163,9 @@ type Bourbon interface {
 
 	// Routes returns a slice of routes defined on the Bourbon
 	Routes() []Route
+
+	// Run creates a Server from the Bourbon structure and runs the server.
+	Run()
 }
 
 // ResponseWriter is Bourbon's interface for responding to HTTP requests.

@@ -15,9 +15,11 @@ package bourbon
 import "os"
 
 type bourbon struct {
+	parent	Bourbon
 	prefix     string
 	routes     []Route
 	middleware []Handler
+	children   []Bourbon
 }
 
 var (
@@ -39,11 +41,6 @@ func New() Bourbon {
 // Run combines all Bourbons into a Server and runs the server. Use Run with one
 // or more Bourbons to keep the API modular and composable.
 func Run(bourbons ...Bourbon) {
-	for _, b := range bourbons {
-		defaultServer.Router().Add(b.Routes()...)
-	}
-
-	defaultServer.Run()
 }
 
 // SetRouter accepts a struct that implements that Router interface and replaces
@@ -65,10 +62,21 @@ func SetPort(p string) {
 	defaultPort = p
 }
 
-// SetCreateRoute accepts a function for creating new routes within Bourbon and
-// overrides Bourbon's default function.
-func SetCreateRoute(fn func(method, pattern string, fn Handler) Route) {
-	defaultCreateRoute = fn
+func (b *bourbon) SetParent(parent Bourbon) {
+	b.parent = parent
+}
+
+func (b *bourbon) Parent() Bourbon {
+	return b.parent
+}
+
+func (b *bourbon) Children() []Bourbon {
+	return b.children
+}
+
+func (b *bourbon) Mount(child Bourbon) {
+	b.SetParent(b)
+	b.children = append(b.children, child)
 }
 
 func (b *bourbon) SetPrefix(prefix string) {
@@ -115,8 +123,21 @@ func (b *bourbon) Delete(pattern string, fn Handler) {
 	b.addRoute("DELETE", pattern, fn)
 }
 
+func (b *bourbon) Run() {
+	appendRoute(defaultServer.Router(), b)
+	defaultServer.Run()
+}
+
 func (b *bourbon) addRoute(method, pattern string, fn Handler) {
 	r := defaultCreateRoute(method, pattern, fn)
 	r.SetParent(b)
 	b.routes = append(b.routes, r)
+}
+
+func appendRoute(r Router, b Bourbon) {
+	r.Add(b.Routes()...)
+
+	for _, child := range b.Children() {
+		appendRoute(r, child)
+	}
 }

@@ -25,7 +25,15 @@ func (r *route) Method() string {
 }
 
 func (r *route) Pattern() string {
-	return r.pattern
+	pattern := r.pattern
+	parent := r.Parent()
+
+	for parent != nil {
+		pattern = parent.Prefix() + pattern
+		parent = parent.Parent()
+	}
+
+	return pattern
 }
 
 func (r *route) Handler() Handler {
