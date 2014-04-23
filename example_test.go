@@ -6,13 +6,9 @@ import (
 )
 
 func ExampleRun() {
-	b1 := bourbon.New()
-	b1.Get("/b1", func() {})
-
-	b2 := bourbon.New()
-	b2.Get("/b2", func() {})
-
-	bourbon.Run(b1, b2)
+	b := bourbon.New()
+	b.Get("/", func() {})
+	b.Run()
 }
 
 func ExampleParams() {
@@ -21,7 +17,7 @@ func ExampleParams() {
 		println(params["id"])
 	})
 
-	bourbon.Run(b)
+	b.Run()
 }
 
 func ExampleEncodeable() {
@@ -84,4 +80,16 @@ func ExampleHandler() {
 	b.Post("/example", func(e Example) (int, bourbon.Encodeable) {
 		return 201, e
 	})
+}
+
+func ExampleMount() {
+	// The child Bourbon will inherit middleware and URL prefixes from all
+	// of it's ascending Bourbon parents.
+	parent := bourbon.New()
+	first := bourbon.New()
+	last := bourbon.New()
+
+	parent.Mount(first)
+	first.Mount(last)
+	parent.Run()
 }
