@@ -9,7 +9,7 @@
 //     return resource
 //   })
 //
-//   bourbon.Run(b)
+//   b.Run(b)
 package bourbon
 
 import "os"
@@ -36,11 +36,6 @@ func New() Bourbon {
 	b.Use(DecodeHandler)
 
 	return b
-}
-
-// Run combines all Bourbons into a Server and runs the server. Use Run with one
-// or more Bourbons to keep the API modular and composable.
-func Run(bourbons ...Bourbon) {
 }
 
 // SetRouter accepts a struct that implements that Router interface and replaces
