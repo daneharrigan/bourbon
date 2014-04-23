@@ -41,6 +41,10 @@ func (r *route) Handler() Handler {
 }
 
 func (r *route) Middleware() []Handler {
+	if r.Parent() == nil {
+		return nil
+	}
+
 	return r.Parent().Middleware()
 }
 

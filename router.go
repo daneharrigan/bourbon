@@ -15,7 +15,7 @@ func (rt *router) Add(routes ...Route) {
 	}
 }
 
-func (rt *router) Find(method, uri string) Action {
+func (rt *router) Find(method, uri string) Route {
 	// serve OPTIONS
 	if method == "OPTIONS" {
 		var methods []string
@@ -32,16 +32,16 @@ func (rt *router) Find(method, uri string) Action {
 		if len(methods) > 0 {
 			options := createOptions(methods)
 			options.SetParent(parent)
-			return createContext(options)
+			return options
 		}
 
-		return createContext(createNotFound())
+		return createNotFound()
 	}
 
 	// serve route
 	for _, r := range rt.routes[method] {
 		if r.Regexp().MatchString(uri) {
-			return createContext(r)
+			return r
 		}
 	}
 
@@ -55,13 +55,13 @@ func (rt *router) Find(method, uri string) Action {
 			if r.Regexp().MatchString(uri) {
 				methodNotAllowed := createMethodNotAllowed()
 				methodNotAllowed.SetParent(r.Parent())
-				return createContext(methodNotAllowed)
+				return methodNotAllowed
 			}
 		}
 	}
 
 	// serve 404
-	return createContext(createNotFound())
+	return createNotFound()
 }
 
 func createOptions(methods []string) Route {

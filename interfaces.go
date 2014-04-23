@@ -40,8 +40,8 @@ type Router interface {
 	// Add appends routes to the Router.
 	Add(...Route)
 
-	// Find accepts the request method, URL and returns an Action.
-	Find(string, string) Action
+	// Find accepts the request method, URL and returns a Route.
+	Find(string, string) Route
 }
 
 // Route is Bourbon's Route interface. It stores the HTTP request method, URL
