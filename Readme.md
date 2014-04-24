@@ -31,7 +31,7 @@ func main() {
 		return Example{Message: "Hello World!"}
 	})
 
-	bourbon.Run(b)
+	b.Run()
 }
 ```
 
@@ -64,16 +64,14 @@ write as possible. Common or repetitive tasks should be handled by Bourbon.
 
 #### Composablity
 
-Bourbon's `Run` function accepts many instances of Bourbon and combines them to
-make a single web service. This allows you to extract components into
-stand-alone packages and sub-packages.
+A Bourbon can be mounted onto another Bourbon and inherit properties such as
+middleware and URL prefix.
 
 ```go
 package main
 
 import (
 	"github.com/daneharrigan/bourbon"
-	"github.com/example/oauth2"
 	"github.com/example/myproject/v1"
 	"github.com/example/myproject/v2"
 )
@@ -81,11 +79,15 @@ import (
 func main() {
 	v1.API.SetPrefix("/v1")
 	v2.API.SetPrefix("/v2")
-	bourbon.Run(oauth2.Bourbon, v1.API, v2.API)
+
+	b := bourbon.New()
+	b.Mount(v1.API)
+	b.Mount(v2.API)
+	b.Run()
 }
 ```
 
-The `oauth2`, `v1` and `v2` packages in this example could be run independently
+The `v1` and `v2` packages in this example could be run independently
 of each other, but they can also be combined and run as a single web service.
 
 #### Encoding Responses
@@ -108,7 +110,7 @@ func main() {
 		return Example{Message: "Hello World!"}
 	})
 
-	bourbon.Run(b)
+	b.Run()
 }
 ```
 
@@ -134,7 +136,7 @@ func main() {
 		return 201, e
 	})
 
-	bourbon.Run(b)
+	b.Run()
 }
 ```
 
@@ -154,7 +156,7 @@ func main() {
 	b.Put("/", func(){ /* some work */ })
 	b.Post("/", func(){ /* some work */ })
 
-	bourbon.Run(b)
+	b.Run()
 }
 ```
 
@@ -187,7 +189,7 @@ func main() {
 		return Example{Message: "Hello World!"}
 	})
 
-	bourbon.Run(b)
+	b.Run()
 }
 ```
 

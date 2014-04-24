@@ -9,7 +9,7 @@
 //     return resource
 //   })
 //
-//   b.Run(b)
+//   b.Run()
 package bourbon
 
 import "os"

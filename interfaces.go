@@ -112,13 +112,16 @@ type Bourbon interface {
 	Prefix() string
 
 	// Use appends middleware to be used on each request in the Bourbon.
-	// Middleware is scoped to a single Bourbon. Running mutliple Bourbons
-	// at the same time will not combine middleware.
+	// Middleware is scoped to a single Bourbon. Middleware used on a parent
+	// Bourbon will apply to all mounted Bourbons. Middleware of mounted
+	// Bourbons will not apply to parents.
 	//
-	//   public  := bourbon.New() // does not use basic auth
 	//   private := bourbon.New() // does use basic auth
 	//   private.Use(BasicAuthHandler)
-	//   bourbon.Run(public, private)
+	//
+	//   public  := bourbon.New() // does not use basic auth
+	//   public.Mount(private)
+	//   public.Run()
 	Use(...Handler)
 
 	// Middleware returns all of the middleware used by the Bourbon.
