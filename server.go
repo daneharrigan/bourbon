@@ -6,9 +6,6 @@ type defaultServer struct {
 }
 
 func (s *defaultServer) Run() {
-	if port == "" {
-		port = "5000"
-	}
 	http.ListenAndServe(":"+port, s)
 }
 

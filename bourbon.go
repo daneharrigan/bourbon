@@ -31,6 +31,10 @@ var (
 
 func init() {
 	port = os.Getenv("PORT")
+	if port == "" {
+		port = "5000"
+	}
+
 	router = createDefaultRouter()
 	server = new(defaultServer)
 	middleware = append(middleware, ContentTypeHandler, DecodeHandler)
