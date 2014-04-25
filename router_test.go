@@ -11,7 +11,7 @@ import (
 )
 
 func TestRouterAdd(t *testing.T) {
-	rt := createRouter()
+	rt := createDefaultRouter().(*defaultRouter)
 	rt.Add(&route{parent: new(bourbon), method: "GET", pattern: "/"})
 	rt.Add(&route{parent: new(bourbon), method: "POST", pattern: "/"})
 
@@ -20,16 +20,18 @@ func TestRouterAdd(t *testing.T) {
 }
 
 func TestRouterFindRoute(t *testing.T) {
-	rt, r, rw := createRouterWithRoute()
-	action := rt.Find("OPTIONS", "/")
-	action.Run(rw, r)
+	rt, req, rw := createRouterWithRoute()
+	r := rt.Find("OPTIONS", "/")
+	c := createContext(r, rw, req)
+	c.Run()
 	assert.Equal(t, 200, rw.Code)
 }
 
 func TestRouterFindOptions(t *testing.T) {
-	rt, r, rw := createRouterWithRoute()
-	action := rt.Find("OPTIONS", "/")
-	action.Run(rw, r)
+	rt, req, rw := createRouterWithRoute()
+	r := rt.Find("OPTIONS", "/")
+	c := createContext(r, rw, req)
+	c.Run()
 
 	assert.Equal(t, 200, rw.Code)
 	assert.Equal(t, "0", rw.HeaderMap.Get("Content-Length"))
@@ -37,9 +39,10 @@ func TestRouterFindOptions(t *testing.T) {
 }
 
 func TestRouterFindPageNotFound(t *testing.T) {
-	rt, r, rw := createRouterWithRoute()
-	action := rt.Find("GET", "/404")
-	action.Run(rw, r)
+	rt, req, rw := createRouterWithRoute()
+	r := rt.Find("GET", "/404")
+	c := createContext(r, rw, req)
+	c.Run()
 
 	msg, _ := json.Marshal(Message{Code: 404, Message: http.StatusText(404)})
 	enc, _ := ioutil.ReadAll(rw.Body)
@@ -49,9 +52,10 @@ func TestRouterFindPageNotFound(t *testing.T) {
 }
 
 func TestRouterFindMethodNotAllowed(t *testing.T) {
-	rt, r, rw := createRouterWithRoute()
-	action := rt.Find("POST", "/")
-	action.Run(rw, r)
+	rt, req, rw := createRouterWithRoute()
+	r := rt.Find("POST", "/")
+	c := createContext(r, rw, req)
+	c.Run()
 
 	msg, _ := json.Marshal(Message{Code: 405, Message: http.StatusText(405)})
 	enc, _ := ioutil.ReadAll(rw.Body)
@@ -60,13 +64,9 @@ func TestRouterFindMethodNotAllowed(t *testing.T) {
 	assert.Equal(t, msg, enc[:len(enc)-1])
 }
 
-func createRouter() *router {
-	return &router{routes: make(map[string][]Route)}
-}
-
 func createRouterWithRoute() (Router, *http.Request, *httptest.ResponseRecorder) {
 	fn := func() int { return 200 }
-	rt := createRouter()
+	rt := createDefaultRouter()
 	rt.Add(&route{parent: new(bourbon), method: "GET", pattern: "/", handler: fn})
 	r, _ := http.NewRequest("GET", "http://example.com/", strings.NewReader(""))
 	rw := httptest.NewRecorder()

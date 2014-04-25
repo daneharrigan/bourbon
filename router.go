@@ -5,23 +5,23 @@ import (
 	"strings"
 )
 
-type router struct {
+type defaultRouter struct {
 	routes map[string][]Route
 }
 
-func (rt *router) Add(routes ...Route) {
+func (dr *defaultRouter) Add(routes ...Route) {
 	for _, r := range routes {
-		rt.routes[r.Method()] = append(rt.routes[r.Method()], r)
+		dr.routes[r.Method()] = append(dr.routes[r.Method()], r)
 	}
 }
 
-func (rt *router) Find(method, uri string) Action {
+func (dr *defaultRouter) Find(method, uri string) Route {
 	// serve OPTIONS
 	if method == "OPTIONS" {
 		var methods []string
 		var parent Bourbon
-		for k := range rt.routes {
-			for _, r := range rt.routes[k] {
+		for k := range dr.routes {
+			for _, r := range dr.routes[k] {
 				if r.Regexp().MatchString(uri) {
 					methods = append(methods, k)
 					parent = r.Parent()
@@ -32,21 +32,21 @@ func (rt *router) Find(method, uri string) Action {
 		if len(methods) > 0 {
 			options := createOptions(methods)
 			options.SetParent(parent)
-			return createContext(options)
+			return options
 		}
 
-		return createContext(createNotFound())
+		return createNotFound()
 	}
 
 	// serve route
-	for _, r := range rt.routes[method] {
+	for _, r := range dr.routes[method] {
 		if r.Regexp().MatchString(uri) {
-			return createContext(r)
+			return r
 		}
 	}
 
 	// serve 405
-	for m, routes := range rt.routes {
+	for m, routes := range dr.routes {
 		if m == method {
 			continue
 		}
@@ -55,13 +55,13 @@ func (rt *router) Find(method, uri string) Action {
 			if r.Regexp().MatchString(uri) {
 				methodNotAllowed := createMethodNotAllowed()
 				methodNotAllowed.SetParent(r.Parent())
-				return createContext(methodNotAllowed)
+				return methodNotAllowed
 			}
 		}
 	}
 
 	// serve 404
-	return createContext(createNotFound())
+	return createNotFound()
 }
 
 func createOptions(methods []string) Route {
@@ -87,4 +87,8 @@ func createNotFound() Route {
 			return 404, CreateMessage(404)
 		},
 	}
+}
+
+func createDefaultRouter() Router {
+	return &defaultRouter{routes: make(map[string][]Route)}
 }

@@ -40,8 +40,8 @@ type Router interface {
 	// Add appends routes to the Router.
 	Add(...Route)
 
-	// Find accepts the request method, URL and returns an Action.
-	Find(string, string) Action
+	// Find accepts the request method, URL and returns a Route.
+	Find(string, string) Route
 }
 
 // Route is Bourbon's Route interface. It stores the HTTP request method, URL
@@ -69,6 +69,11 @@ type Route interface {
 	// request.
 	Handler() Handler
 
+	// Middleware returns a slice of Handlers to be invoked before invoking
+	// the route Handler. The slice contains all middleware of the parent
+	// Bourbon and the Bourbon's following parents.
+	Middleware() []Handler
+
 	// Regexp returns the regular expression used for matching the route
 	// against the request URL. It is also used to read parameters from the
 	// URL.
@@ -83,6 +88,20 @@ type Action interface {
 
 // Bourbon is the initial interface in the Bourbon package.
 type Bourbon interface {
+	// SetParent assigns a Bourbon as the parent of another Bourbon
+	// structure.
+	SetParent(Bourbon)
+
+	// Parent return the parent Bourbon structure.
+	Parent() Bourbon
+
+	// Children returns a slice of embedded Bourbon structures.
+	Children() []Bourbon
+
+	// Mount embeds a Bourbon within another Bourbon. The embedded Bourbon
+	// inherits the middleware and error handling of the parent Bourbon.
+	Mount(Bourbon)
+
 	// SetPrefix accepts a string to prefix every route in the Bourbon.
 	//
 	//   v1 := bourbon.New()
@@ -93,13 +112,16 @@ type Bourbon interface {
 	Prefix() string
 
 	// Use appends middleware to be used on each request in the Bourbon.
-	// Middleware is scoped to a single Bourbon. Running mutliple Bourbons
-	// at the same time will not combine middleware.
+	// Middleware is scoped to a single Bourbon. Middleware used on a parent
+	// Bourbon will apply to all mounted Bourbons. Middleware of mounted
+	// Bourbons will not apply to parents.
 	//
-	//   public  := bourbon.New() // does not use basic auth
 	//   private := bourbon.New() // does use basic auth
 	//   private.Use(BasicAuthHandler)
-	//   bourbon.Run(public, private)
+	//
+	//   public  := bourbon.New() // does not use basic auth
+	//   public.Mount(private)
+	//   public.Run()
 	Use(...Handler)
 
 	// Middleware returns all of the middleware used by the Bourbon.
@@ -149,6 +171,9 @@ type Bourbon interface {
 
 	// Routes returns a slice of routes defined on the Bourbon
 	Routes() []Route
+
+	// Run creates a Server from the Bourbon structure and runs the server.
+	Run()
 }
 
 // ResponseWriter is Bourbon's interface for responding to HTTP requests.
