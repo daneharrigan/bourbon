@@ -33,7 +33,7 @@ func ContentTypeHandler(rw http.ResponseWriter, r *http.Request) (int, Encodeabl
 // contains a struct type that does not belong to the net/http or bourbon
 // package, DecodeHandler assumes the request body should be decoded into a
 // value of that type and passed into the route's Handler.
-func DecodeHandler(c context, r *http.Request) (int, Encodeable) {
+func DecodeHandler(c *context, r *http.Request) (int, Encodeable) {
 	if r.ContentLength == 0 {
 		return 0, nil
 	}

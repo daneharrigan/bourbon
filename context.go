@@ -33,10 +33,9 @@ func (c *context) handleReturns(values []reflect.Value, err error) {
 }
 
 func (c *context) Run() {
-
 	defer c.r.Body.Close()
-	for _, middleware := range c.middleware {
-		c.handleReturns(c.Invoke(middleware))
+	for _, m := range c.middleware {
+		c.handleReturns(c.Invoke(m))
 		if c.rw.Written() {
 			return
 		}
@@ -46,12 +45,13 @@ func (c *context) Run() {
 }
 
 func createContext(r Route, w http.ResponseWriter, req *http.Request) *context {
-	middleware := append(middleware, r.Middleware()...)
+	mw := append(middleware, r.Middleware()...)
 	rw := createResponseWriter(w)
-	c := &context{inject.New(), r.Handler(), middleware, r, rw, req}
+	c := &context{inject.New(), r.Handler(), mw, r, rw, req}
 	c.MapTo(c.rw, (*ResponseWriter)(nil))
 	c.MapTo(c.rw, (*http.ResponseWriter)(nil))
 	c.Map(createParams(c))
+	c.Map(req)
 	c.Map(r)
 	c.Map(c)
 
