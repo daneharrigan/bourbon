@@ -131,7 +131,7 @@ func TestMiddlewareDecodeHandlerWithContentLengthZero(t *testing.T) {
 	assert.Equal(t, nil, encodeable)
 }
 
-func createTestContext(fn Handler, r *http.Request) context {
+func createTestContext(fn Handler, r *http.Request) *context {
 	rt := &route{new(bourbon), "GET", "/", fn, nil}
-	return context{inject.New(), fn, nil, rt, nil, r}
+	return &context{inject.New(), fn, nil, rt, nil, r}
 }
